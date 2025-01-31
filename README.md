@@ -1,128 +1,51 @@
 # Call Center Data Cleaning and Analysis  
 
-## Database and Table Selection  
-```sql
-USE call_centerdata;
-SELECT * FROM call_center;
-```
+## Project Overview  
+This project focuses on cleaning and analyzing call center data to improve data quality and derive insights. The SQL script performs data preprocessing, exploratory analysis, and statistical calculations.  
 
-## Data Cleaning  
+## Dataset  
+The project utilizes the `call_center` table from the `call_centerdata` database, which contains:  
+- **Call details:** Timestamp, duration, response time  
+- **Customer feedback:** CSAT score, sentiment  
+- **Geographic data:** City, call center location  
 
-### Disable Safe Updates  
-```sql
-SET SQL_SAFE_UPDATES = 0;
-```
+## Key Steps  
 
-### Changing Date Format  
-```sql
-UPDATE call_center  
-SET call_timestamp = STR_TO_DATE(call_timestamp, "%m/%d/%Y");
-```
+### 1. Data Cleaning  
+- **Converted** date formats for consistency  
+- **Replaced** empty CSAT scores with `NULL` values  
 
-### Updating Empty Values to NULL  
-```sql
-UPDATE call_center  
-SET csat_score = NULL  
-WHERE csat_score = '';
-```
+### 2. Data Exploration  
+- **Counted** the number of rows and columns  
+- **Extracted** distinct values for key categorical columns (city, sentiment, call center)  
+- **Calculated** the distribution of calls per city  
 
-### Enable Safe Updates  
-```sql
-SET SQL_SAFE_UPDATES = 1;
-```
+### 3. Call Analysis  
+- **Determined** call volume per day of the week  
+- **Computed** statistics for call duration (min, max, average)  
+- **Analyzed** CSAT scores while excluding zero values  
 
-### View Sample Data  
-```sql
-SELECT * FROM call_center LIMIT 10;
-```
+### 4. Response Time and Duration Insights  
+- **Grouped** data by call center and response time  
+- **Identified** the maximum call duration per day  
 
-## Counting Rows and Columns  
+## Technologies Used  
+- **SQL** for data cleaning and analysis  
+- **MySQL Workbench** or any compatible SQL environment  
 
-### Number of Rows  
-```sql
-SELECT COUNT(*) AS num_rows FROM call_center;
-```
+## How to Run the Project  
 
-### Number of Columns  
-```sql
-SELECT COUNT(*) AS num_columns  
-FROM information_schema.columns  
-WHERE table_name = 'call_center' AND table_schema = 'call_centerdata';
-```
+1. **Clone the repository:**  
+   ```bash
+   git clone <repo-link>
+   ```
+2. **Connect to your SQL database** and ensure the `call_centerdata` database is available.  
+3. **Execute the SQL script** to clean and analyze the data.  
 
-## Distinct Values in Each Column  
+## Next Steps & Improvements  
+- Implement data visualization using Python or Power BI  
+- Apply machine learning to predict customer satisfaction scores  
+- Optimize SQL queries for large datasets  
 
-### Unique Sentiments  
-```sql
-SELECT DISTINCT sentiment FROM call_center;
-```
-
-### Unique Cities  
-```sql
-SELECT DISTINCT city FROM call_center;
-```
-
-### Unique Call Centers  
-```sql
-SELECT DISTINCT call_center FROM call_center;
-```
-
-## Count and Percentage of Distinct Values  
-
-### Count and Percentage of Each City  
-```sql
-SELECT city,  
-  COUNT(*) AS count,  
-  COUNT(*) * 100.0 / (SELECT COUNT(*) FROM call_center) AS percentage  
-FROM call_center  
-GROUP BY city;
-```
-
-## Call Count Analysis  
-
-### Calls Per Day of the Week  
-```sql
-SELECT DAYNAME(call_timestamp) AS day_of_week,  
-COUNT(*) AS call_count  
-FROM call_center  
-GROUP BY day_of_week  
-ORDER BY call_count DESC;
-```
-
-## Statistical Calculations  
-
-### Call Duration Statistics  
-```sql
-SELECT  
-  MIN(`call duration in minutes`) AS min_duration,  
-  MAX(`call duration in minutes`) AS max_duration,  
-  AVG(`call duration in minutes`) AS avg_duration  
-FROM call_center;
-```
-
-### CSAT Score Statistics (Ignoring Zero Scores)  
-```sql
-SELECT  
-  MIN(csat_score) AS min_csat,  
-  MAX(csat_score) AS max_csat,  
-  ROUND(AVG(csat_score), 2) AS avg_csat  
-FROM call_center  
-WHERE csat_score <> 0;
-```
-
-### Response Time Analysis  
-```sql
-SELECT call_center, response_time, COUNT(*) as count  
-FROM call_centerdata.call_center  
-GROUP BY 1, 2  
-ORDER BY 1, 3 DESC;
-```
-
-### Maximum Call Duration Per Day  
-```sql
-SELECT  
-  DATE(call_timestamp) AS call_day,  
-  MAX(`call duration in minutes`) AS max_call_duration  
-FROM call_center  
-GROUP BY call_day  
-ORDER BY call_day;
+## Disclaimer  
+This project is for educational purposes and should be used with anonymized or synthetic data to protect privacy.  
